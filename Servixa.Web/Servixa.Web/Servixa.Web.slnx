@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="../../Core/Servixa.Abstractions/Servixa.Abstractions.csproj" />
+    <Project Path="../../Core/Servixa.Domain/Servixa.Domain.csproj" />
+    <Project Path="../../Core/Servixa.Services/Servixa.Services.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="../../Infrastructure/Servixa.Presintation/Servixa.Presintation.csproj" />
+    <Project Path="../../Infrastructure/Servixa.Presistence/Servixa.Presistence.csproj" />
+  </Folder>
+  <Project Path="../Servixa.Shared/Servixa.Shared.csproj" />
+  <Project Path="Servixa.Web.csproj" />
+</Solution>

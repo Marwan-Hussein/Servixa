@@ -1,0 +1,6 @@
+@Servixa.Web_HostAddress = http://localhost:5027
+
+GET {{Servixa.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
