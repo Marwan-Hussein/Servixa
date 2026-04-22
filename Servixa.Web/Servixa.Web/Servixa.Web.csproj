@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\Infrastructure\Servixa.Presistence\Servixa.Presistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ClientApp\" />
+  </ItemGroup>
+
 </Project>
