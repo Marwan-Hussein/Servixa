@@ -6,7 +6,7 @@
   </Folder>
   <Folder Name="/Infrastructure/">
     <Project Path="../../Infrastructure/Servixa.Presintation/Servixa.Presintation.csproj" />
-    <Project Path="../../Infrastructure/Servixa.Presistence/Servixa.Presistence.csproj" />
+    <Project Path="../../Infrastructure/Servixa.Presistence/Servixa.Persistence.csproj" />
   </Folder>
   <Project Path="../Servixa.Shared/Servixa.Shared.csproj" />
   <Project Path="Servixa.Web.csproj" />

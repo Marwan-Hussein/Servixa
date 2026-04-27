@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Servixa.Domain.Models.Users;
 
-namespace Servixa.Presistence.DbContext
+namespace Servixa.Persistence.DbContext
 {
     public class ServixaDbContext(DbContextOptions<ServixaDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>(options)  
     {

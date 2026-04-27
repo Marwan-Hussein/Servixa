@@ -1,11 +1,11 @@
 ﻿using Servixa.Domain.Contracts;
 using Servixa.Domain.Contracts.IGenericRepoPattern;
 using Servixa.Domain.Contracts.UnitOfWorkPattern;
-using Servixa.Presistence.DbContext;
-using Servixa.Presistence.Implemntation.GenericRepoPattern;
+using Servixa.Persistence.DbContext;
+using Servixa.Persistence.Implemntation.GenericRepoPattern;
 
 
-namespace Servixa.Presistence.Implemntation.UnitOfWorkPattern
+namespace Servixa.Persistence.Implemntation.UnitOfWorkPattern
 {
     public class UnitOfWork(ServixaDbContext _context) : IUnitOfWork
     {

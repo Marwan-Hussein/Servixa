@@ -1,5 +1,5 @@
 
-using Servixa.Presistence.ProgarmService;
+using Servixa.Persistence.ProgramService;
 using Servixa.Web.Extensions;
 
 namespace Servixa.Web

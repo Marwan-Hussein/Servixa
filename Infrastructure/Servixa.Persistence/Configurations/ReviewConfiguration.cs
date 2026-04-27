@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Servixa.Domain.Models.ReviewEntity;
 
-namespace Servixa.Presistence.Configurations
+namespace Servixa.Persistence.Configurations
 {
     public class ReviewConfiguration : IEntityTypeConfiguration<Review>
     {

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Servixa.Domain.Models.PaymentEntity;
 
-namespace Servixa.Presistence.Configurations
+namespace Servixa.Persistence.Configurations
 {
     public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
     {

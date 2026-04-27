@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Servixa.Domain.Contracts;
 using Servixa.Domain.Contracts.IGenericRepoPattern;
-using Servixa.Presistence.DbContext;
+using Servixa.Persistence.DbContext;
 
 
-namespace Servixa.Presistence.Implemntation.GenericRepoPattern
+namespace Servixa.Persistence.Implemntation.GenericRepoPattern
 {
     public class GenericRepo<TEntity, Tkey> : IGenericRepo<TEntity, Tkey> where TEntity : class , IEntity<Tkey>
     {

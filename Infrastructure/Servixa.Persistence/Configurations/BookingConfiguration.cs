@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Servixa.Domain.Models.BookingEntity;
 
-namespace Servixa.Presistence.Configurations
+namespace Servixa.Persistence.Configurations
 {
     public class BookingConfiguration : IEntityTypeConfiguration<Booking>
     {

@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\Servixa.Presintation\Servixa.Presintation.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Servixa.Presistence\Servixa.Presistence.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Servixa.Persistence\Servixa.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

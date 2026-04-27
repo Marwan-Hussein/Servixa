@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Servixa.Presistence.Configurations
+namespace Servixa.Persistence.Configurations
 {
     public class TaskConfiguration : IEntityTypeConfiguration<Servixa.Domain.Models.TaskEntity.Task>
     {
