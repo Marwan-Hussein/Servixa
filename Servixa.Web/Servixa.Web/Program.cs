@@ -1,4 +1,7 @@
 
+using Servixa.Presistence.ProgarmService;
+using Servixa.Web.Extensions;
+
 namespace Servixa.Web
 {
     public class Program
@@ -10,6 +13,10 @@ namespace Servixa.Web
             // Add services to the container.
 
             builder.Services.AddControllers();
+            //injecting database services
+            builder.Services.InjectDbService(builder.Configuration);
+            //injecting application services
+            builder.Services.InjectApplicationService();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
