@@ -32,7 +32,6 @@ namespace Servixa.Web
 
             app.UseHttpsRedirection();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
 

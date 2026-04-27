@@ -13,11 +13,11 @@ namespace Servixa.Persistence.DbContext
             
             builder.ApplyConfigurationsFromAssembly(typeof(ServixaDbContext).Assembly);
             builder.Entity<ApplicationUser>().ToTable("Users");
-            builder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
-            builder.Entity<IdentityUserClaim<int>>().ToTable("UserClaims");
-            builder.Entity<IdentityUserLogin<int>>().ToTable("UserLogins");
-            builder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
-            builder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
+            builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+            builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+            builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+            builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+            builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
         }
     }
 }
