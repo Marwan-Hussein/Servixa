@@ -18,5 +18,6 @@ namespace Servixa.Presistence.Implemntation.GenericRepoPattern
         public async Task AddAsync(TEntity entity) => await _dbSet.AddAsync(entity);
         public void UpdateAsync(TEntity entity) => _dbSet.Update(entity);
         public void DeleteAsync(TEntity entity) => _dbSet.Remove(entity);
+
     }
 }
