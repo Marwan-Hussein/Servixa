@@ -11,10 +11,10 @@ namespace Servixa.Domain.Models.BookingEntity
 {
     public class Booking : BaseEntity<int>
     {
-        public string ClientId { get; set; } = string.Empty;
+        public int ClientId { get; set; }
         public virtual Client Client { get; set; } = null!;
 
-        public string WorkerId { get; set; } = string.Empty;
+        public int WorkerId { get; set; }
         public virtual Worker Worker { get; set; } = null!;
 
         public int TaskId { get; set; }

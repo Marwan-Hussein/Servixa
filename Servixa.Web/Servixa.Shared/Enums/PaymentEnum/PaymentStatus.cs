@@ -1,4 +1,4 @@
-namespace Servixa.Domain.Enums
+namespace Servixa.Shared.Enums
 {
     public enum PaymentStatus
     {

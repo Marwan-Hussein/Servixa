@@ -6,6 +6,6 @@ namespace Servixa.Shared.Enums
         Accepted=2,
         InProgress=3,
         Completed=4,
-        Canceled=5  
+        Cancelled = 5  
     }
 }

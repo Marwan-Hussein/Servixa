@@ -7,16 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\Servixa.Presintation\Servixa.Presintation.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Servixa.Presistence\Servixa.Presistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="ClientApp\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
   </ItemGroup>
 
 </Project>
