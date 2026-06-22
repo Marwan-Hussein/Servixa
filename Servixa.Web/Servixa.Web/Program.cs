@@ -1,18 +1,33 @@
 
+using Microsoft.AspNetCore.Identity;
+using Servixa.Domain.Models.Users;
 using Servixa.Presistence.ProgarmService;
 using Servixa.Web.Extensions;
+using Servixa.Web.Middleware;
 
 namespace Servixa.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async System.Threading.Tasks.Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
 
             builder.Services.AddControllers();
+            
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
             //injecting database services
             builder.Services.InjectDbService(builder.Configuration);
             //injecting application services
@@ -23,6 +38,26 @@ namespace Servixa.Web
 
             var app = builder.Build();
 
+            // Seed Database
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<Servixa.Presistence.DbContext.ServixaDbContext>();
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+                    
+                    await ServixaDbSeeder.SeedAsync(roleManager, userManager, context);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred during database seeding.");
+                }
+            }
+
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -31,13 +66,17 @@ namespace Servixa.Web
             }
 
             app.UseHttpsRedirection();
+            
+            app.UseStaticFiles(); // For wwwroot/uploads
+            
+            app.UseCors("AllowAll");
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Servixa.Domain.Models.NotificationEntity
 {
     public class Notification : BaseEntity<int>
     {
-        public string ReceiverId { get; set; } = string.Empty;
+        public int ReceiverId { get; set; }
         public virtual ApplicationUser Receiver { get; set; } = null!;
 
         public string Title { get; set; } = string.Empty;

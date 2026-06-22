@@ -1,4 +1,3 @@
-using Servixa.Domain.Enums;
 using Servixa.Domain.Models.NotificationEntity;
 using Servixa.Domain.Models.BookingEntity;
 using Servixa.Domain.Models.ReviewEntity;

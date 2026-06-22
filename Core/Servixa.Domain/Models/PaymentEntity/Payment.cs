@@ -1,4 +1,3 @@
-using Servixa.Domain.Enums;
 using Servixa.Shared.Enums;
 using Servixa.Domain.Models.BookingEntity;
 

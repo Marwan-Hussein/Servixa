@@ -5,7 +5,7 @@ namespace Servixa.Domain.Models
 {
     public class WorkerTask : BaseEntity<int>
     {
-        public string WorkerId { get; set; } = string.Empty;
+        public int WorkerId { get; set; }
         public virtual Worker Worker { get; set; } = null!;
 
         public int TaskId { get; set; }
