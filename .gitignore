@@ -417,3 +417,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /Infrastructure/Servixa.Presistence/Migrations
+Servixa.Web/Servixa.Web/appsettings.json
