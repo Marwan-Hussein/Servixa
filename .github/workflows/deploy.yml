@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore Forsa/Forsa.csproj
+        run: dotnet restore Servixa.Web\Servixa.Web.csproj
 
       - name: Publish application
-        run: dotnet publish Forsa/Forsa.csproj -c Release -o publish
+        run: dotnet publish Servixa.Web\Servixa.Web.csproj -c Release -o publish
 
       - name: Deploy to MonsterASP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
