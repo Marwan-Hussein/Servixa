@@ -21,17 +21,20 @@ namespace Servixa.Services.Implementations
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IConfiguration _config;
         private readonly IFileService _fileService;
+        private readonly IOtpService _otpService;
 
         public AuthService(
             UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole<int>> roleManager,
             IConfiguration config,
-            IFileService fileService)
+            IFileService fileService,
+            IOtpService otpService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _config = config;
             _fileService = fileService;
+            _otpService = otpService;
         }
 
         public async Task<AuthResponseDto> RegisterClientAsync(RegisterClientDto dto)
@@ -49,7 +52,8 @@ namespace Servixa.Services.Implementations
                 PhoneNumber = dto.PhoneNumber,
                 DefaultAddress = dto.DefaultAddress,
                 Latitude = dto.Latitude,
-                Longitude = dto.Longitude
+                Longitude = dto.Longitude,
+                EmailConfirmed = false
             };
 
             var result = await _userManager.CreateAsync(client, dto.Password);
@@ -57,6 +61,7 @@ namespace Servixa.Services.Implementations
                 throw new Exception("User creation failed!");
 
             await _userManager.AddToRoleAsync(client, "Client");
+            await _otpService.SendRegistrationOtpAsync(client);
 
             return await GenerateAuthResponse(client);
         }
@@ -99,6 +104,7 @@ namespace Servixa.Services.Implementations
                 NationalIdFrontUrl = nationalIdFrontUrl,
                 NationalIdBackUrl = nationalIdBackUrl,
                 ProfilePictureUrl = profilePicUrl,
+                EmailConfirmed = false,
                 IsVerified = false // Pending admin approval
             };
 
@@ -107,6 +113,7 @@ namespace Servixa.Services.Implementations
                 throw new Exception("Worker creation failed!");
 
             await _userManager.AddToRoleAsync(worker, "Worker");
+            await _otpService.SendRegistrationOtpAsync(worker);
 
             return await GenerateAuthResponse(worker);
         }

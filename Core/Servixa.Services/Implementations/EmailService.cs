@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+using MailKit.Net.Smtp;
+using Microsoft.Extensions.Options;
+using MimeKit;
 using Servixa.Abstractions.Interfaces;
 using Servixa.Abstractions.Settings;
-using System.Net.Mail;
-using MailKit.Net.Smtp;
-using MimeKit;
+using Servixa.Services.Helpers;
+
 namespace Servixa.Services.Implementations
 {
     public class EmailService : IEmailService
@@ -26,12 +27,17 @@ namespace Servixa.Services.Implementations
                 Text = body
             };
 
-            // to connect to the SMTP server and send the email
-            using var client = new MailKit.Net.Smtp.SmtpClient();
+            using var client = new SmtpClient();
             await client.ConnectAsync(_settings.SmtpServer, _settings.Port, MailKit.Security.SecureSocketOptions.StartTls);
             await client.AuthenticateAsync(_settings.SenderEmail, _settings.Password);
             await client.SendAsync(msg);
             await client.DisconnectAsync(true);
+        }
+
+        public async Task SendOtpEmailAsync(string to, string displayName, string otpCode, DateTime expiresAt)
+        {
+            var body = EmailTemplateHelper.BuildOtpTemplate(displayName, otpCode, expiresAt);
+            await SendAsync(to, "Your Servixa verification code", body);
         }
     }
 }

@@ -9,6 +9,7 @@ using Servixa.Domain.Models.SpecialtyEntity;
 using Servixa.Domain.Models.Users;
 using Servixa.Domain.Models;
 using Servixa.Domain.Models.ChatEntity;
+using Servixa.Domain.Models.OtpEntity;
 
 namespace Servixa.Presistence.DbContext
 {
@@ -24,6 +25,7 @@ namespace Servixa.Presistence.DbContext
         public DbSet<Servixa.Domain.Models.TaskEntity.Task> Tasks { get; set; }
         public DbSet<WorkerTask> WorkerTasks { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

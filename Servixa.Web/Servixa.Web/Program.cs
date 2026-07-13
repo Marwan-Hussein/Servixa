@@ -31,7 +31,7 @@ namespace Servixa.Web
             //injecting database services
             builder.Services.InjectDbService(builder.Configuration);
             //injecting application services
-            builder.Services.InjectApplicationService();
+            builder.Services.InjectApplicationService(builder.Configuration);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>

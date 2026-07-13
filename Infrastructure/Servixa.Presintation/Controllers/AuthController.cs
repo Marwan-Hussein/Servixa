@@ -10,10 +10,12 @@ namespace Servixa.Presentation.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IOtpService _otpService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IOtpService otpService)
         {
             _authService = authService;
+            _otpService = otpService;
         }
 
         [HttpPost("register-client")]
@@ -35,6 +37,13 @@ namespace Servixa.Presentation.Controllers
         {
             var result = await _authService.LoginAsync(dto);
             return Ok(result);
+        }
+
+        [HttpPost("verify-email-otp")]
+        public async Task<IActionResult> VerifyEmailOtp([FromBody] VerifyOtpDto dto)
+        {
+            await _otpService.VerifyRegistrationOtpAsync(dto.Email, dto.Code);
+            return Ok(new { Message = "Email verified successfully." });
         }
     }
 }
