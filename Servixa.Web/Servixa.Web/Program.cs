@@ -97,12 +97,12 @@ namespace Servixa.Web
             }*/
 
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            // Enable Swagger in all environments (useful for production testing)
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
+            // Optional: Redirect the root URL "/" to Swagger UI to prevent 404 errors
+            app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
 
             app.UseHttpsRedirection();
             
