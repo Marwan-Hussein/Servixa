@@ -316,6 +316,63 @@ namespace Servixa.Presistence.Migrations
                     b.ToTable("Notification", (string)null);
                 });
 
+            modelBuilder.Entity("Servixa.Domain.Models.OtpEntity.OtpCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Purpose", "IsUsed", "ExpiresAt");
+
+                    b.ToTable("OtpCodes", (string)null);
+                });
+
             modelBuilder.Entity("Servixa.Domain.Models.PaymentEntity.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -799,6 +856,17 @@ namespace Servixa.Presistence.Migrations
                     b.Navigation("Booking");
 
                     b.Navigation("Receiver");
+                });
+
+            modelBuilder.Entity("Servixa.Domain.Models.OtpEntity.OtpCode", b =>
+                {
+                    b.HasOne("Servixa.Domain.Models.Users.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Servixa.Domain.Models.PaymentEntity.Payment", b =>

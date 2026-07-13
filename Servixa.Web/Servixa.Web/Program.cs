@@ -65,7 +65,7 @@ namespace Servixa.Web
             var app = builder.Build();
 
             // Seed Database
-            using (var scope = app.Services.CreateScope())
+            /*using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
@@ -81,7 +81,7 @@ namespace Servixa.Web
                     var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occurred during database seeding.");
                 }
-            }
+            }*/
 
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             // Configure the HTTP request pipeline.
