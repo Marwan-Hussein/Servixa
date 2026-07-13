@@ -18,7 +18,7 @@ namespace Servixa.Web.Extensions
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IPaymentService, PaymentService>();
-            
+            services.AddScoped<IEmailService, EmailService>();
             return services;
         }
     }
