@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_PATH: Servixa.Web/Servixa.Web/Servixa.Web.csproj
+      PUBLISH_DIR: ./publish
 
     steps:
       - name: Checkout repository
@@ -19,18 +23,18 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore Servixa.Web.csproj
+        run: dotnet restore ${{ env.PROJECT_PATH }}
 
       - name: Publish application
-        run: dotnet publish Servixa.Web.csproj -c Release -o publish
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_DIR }} --no-restore
 
       - name: Deploy to MonsterASP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ${{ secrets.MONSTERASP_FTP_SERVER }}
+          username: ${{ secrets.MONSTERASP_FTP_USERNAME }}
+          password: ${{ secrets.MONSTERASP_FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: publish/
-          server-dir: /wwwroot/
+          local-dir: ${{ env.PUBLISH_DIR }}/
+          server-dir: ${{ secrets.MONSTERASP_FTP_SERVER_DIR }}
