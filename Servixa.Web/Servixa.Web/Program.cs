@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Servixa.Domain.Models.Users;
 using Servixa.Presistence.ProgarmService;
 using Servixa.Web.Extensions;
@@ -12,6 +13,18 @@ namespace Servixa.Web
         public static async System.Threading.Tasks.Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            // remote frontend
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Frontend", policy =>
+                {
+                    policy
+                        .WithOrigins("https://servixa-two.vercel.app")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // only if using cookies or SignalR
+                });
+            });
 
             // Add services to the container.
 
