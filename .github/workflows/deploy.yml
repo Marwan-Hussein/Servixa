@@ -28,6 +28,12 @@ jobs:
       - name: Publish application
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_DIR }} --no-restore
 
+      - name: Check secrets
+        run: |
+          echo "Server set: ${{ secrets.MONSTERASP_FTP_SERVER != '' }}"
+          echo "Username set: ${{ secrets.MONSTERASP_FTP_USERNAME != '' }}"
+          echo "Password set: ${{ secrets.MONSTERASP_FTP_PASSWORD != '' }}"
+
       - name: Deploy to MonsterASP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
