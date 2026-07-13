@@ -36,5 +36,5 @@ jobs:
           password: ${{ secrets.MONSTERASP_FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ${{ env.PUBLISH_DIR }}/
-          server-dir: ${{ secrets.MONSTERASP_FTP_SERVER_DIR }}
+          local-dir: publish/
+          server-dir: /wwwroot/
