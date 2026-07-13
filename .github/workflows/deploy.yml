@@ -34,6 +34,13 @@ jobs:
           echo "Username set: ${{ secrets.MONSTERASP_FTP_USERNAME != '' }}"
           echo "Password set: ${{ secrets.MONSTERASP_FTP_PASSWORD != '' }}"
 
+      - name: Put site offline (Release File Locks)
+        run: |
+          echo "<html><body><h1>Deploying new version... Please wait.</h1></body></html>" > app_offline.htm
+          curl -s -T app_offline.htm ftp://${{ secrets.MONSTERASP_FTP_SERVER }}/wwwroot/app_offline.htm --user "${{ secrets.MONSTERASP_FTP_USERNAME }}:${{ secrets.MONSTERASP_FTP_PASSWORD }}"
+          # Copy to publish dir so the FTP action doesn't delete it during sync
+          cp app_offline.htm ${{ env.PUBLISH_DIR }}/app_offline.htm
+
       - name: Deploy to MonsterASP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -42,5 +49,9 @@ jobs:
           password: ${{ secrets.MONSTERASP_FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: publish/
+          local-dir: ./publish/
           server-dir: /wwwroot/
+
+      - name: Bring site back online
+        run: |
+          curl -s -Q "DELE /wwwroot/app_offline.htm" ftp://${{ secrets.MONSTERASP_FTP_SERVER }}/ --user "${{ secrets.MONSTERASP_FTP_USERNAME }}:${{ secrets.MONSTERASP_FTP_PASSWORD }}"
