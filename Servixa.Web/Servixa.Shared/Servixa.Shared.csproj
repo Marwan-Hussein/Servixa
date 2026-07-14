@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\Auth\ExternalAuthResponseDto.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="DTOs\Auth\ExternalAuthResponseDto.cs" />
   </ItemGroup>
 
 </Project>
