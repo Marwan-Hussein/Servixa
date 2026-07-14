@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -54,7 +53,7 @@ namespace Servixa.Presentation.Controllers
                 RedirectUri = redirectUrl
             };
 
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+            return Challenge(properties, "Google");
         }
 
         [HttpGet("google-callback")]
@@ -78,7 +77,7 @@ namespace Servixa.Presentation.Controllers
 
             var externalAuthResult = await _externalAuthService.ProcessExternalLoginAsync(new ExternalAuthDto
             {
-                Provider = GoogleDefaults.AuthenticationScheme,
+                Provider = "Google",
                 ProviderKey = providerKey,
                 Email = email,
                 Name = name,
