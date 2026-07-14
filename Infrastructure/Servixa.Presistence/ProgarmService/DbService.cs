@@ -55,6 +55,12 @@ namespace Servixa.Presistence.ProgarmService
                     ValidAudience = jwtSettings["Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
+            })
+            .AddGoogle(options =>
+            {
+                options.ClientId = configuration["Authentication:Google:GoogleId"]!;
+                options.ClientSecret = configuration["Authentication:Google:GoogleSecret"]!;
+                options.SignInScheme = IdentityConstants.ExternalScheme;
             });
 
             // Unit of Work
