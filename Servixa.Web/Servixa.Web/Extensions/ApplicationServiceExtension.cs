@@ -13,6 +13,7 @@ namespace Servixa.Web.Extensions
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IExternalAuthService, ExternalAuthService>();
             services.AddScoped<IOtpService, OtpService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IReviewService, ReviewService>();

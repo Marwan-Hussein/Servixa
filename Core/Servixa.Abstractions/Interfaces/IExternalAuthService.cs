@@ -1,7 +1,9 @@
-﻿namespace Application.Core.Interfaces.Auth
+using Servixa.Shared.DTOs.Auth;
+
+namespace Servixa.Abstractions.Interfaces
 {
     public interface IExternalAuthService
     {
-        public Task<ExternalAuthResponseDto> ProcessExternalLoginAsync(ExternalAuthDto dto);
+        Task<ExternalAuthResponseDto> ProcessExternalLoginAsync(ExternalAuthDto dto);
     }
 }

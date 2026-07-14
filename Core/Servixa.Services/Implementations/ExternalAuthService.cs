@@ -1,127 +1,140 @@
-﻿using Microsoft.AspNetCore.Identity;
-namespace Application.Services.Auth
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Servixa.Abstractions.Interfaces;
+using Servixa.Domain.Models.Users;
+using Servixa.Shared.DTOs.Auth;
+
+namespace Servixa.Services.Implementations
 {
-    public class ExternalAuthService(UserManager<ApplicationUser> userManager,
-                                      IJwtService jwtService,
-                                      IRefreshTokenService refreshTokenService) : IExternalAuthService
+    public class ExternalAuthService(
+        UserManager<ApplicationUser> userManager,
+        IConfiguration config) : IExternalAuthService
     {
         public async Task<ExternalAuthResponseDto> ProcessExternalLoginAsync(ExternalAuthDto dto)
         {
-            // 1. Check if the user Exist in the DB
+            if (string.IsNullOrWhiteSpace(dto.Provider) ||
+                string.IsNullOrWhiteSpace(dto.ProviderKey) ||
+                string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return new ExternalAuthResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "External login data is incomplete."
+                };
+            }
+
             var user = await userManager.FindByLoginAsync(dto.Provider, dto.ProviderKey);
-            // no user found 
+
             if (user == null)
             {
-                // Check if the user exist with the same email
                 user = await userManager.FindByEmailAsync(dto.Email);
-                // there is email 
+
                 if (user != null)
                 {
-                    var result = await userManager.AddLoginAsync(user, new UserLoginInfo(dto.Provider, dto.ProviderKey, dto.Provider));
-                    if (!result.Succeeded)
+                    var linkResult = await userManager.AddLoginAsync(user, new UserLoginInfo(dto.Provider, dto.ProviderKey, dto.Provider));
+                    if (!linkResult.Succeeded)
                     {
                         return new ExternalAuthResponseDto
                         {
                             IsSuccess = false,
-                            Message = "Failed to link provider."
+                            Message = "Failed to link Google login to the existing account."
                         };
                     }
                 }
-                // no user in the DB  --> create  new user
                 else
                 {
-                    if (string.IsNullOrEmpty(dto.RequestedRole))
-                    {
-                        return new ExternalAuthResponseDto
-                        {
-                            IsSuccess = false,
-                            NeedsRoleSelection = true,
-                            Provider = dto.Provider,
-                            ProviderKey = dto.ProviderKey,
-                            Email = dto.Email,
-                            Name = dto.Name
-                        };
-                    }
+                    var roleToAssign = string.Equals(dto.RequestedRole, "Worker", StringComparison.OrdinalIgnoreCase)
+                        ? "Worker"
+                        : "Client";
 
-                    // Define which roles a user is allowed to "choose" during social login
-                    var allowedRoles = new List<string> { "Attendee", "Organizer", "Owner" };
+                    user = roleToAssign == "Worker"
+                        ? new Worker { IsVerified = false }
+                        : new Client();
 
-                    // Determine which role to assign (Fallback to "Attendee" if the DTO value is invalid)
-                    var roleToAssign = allowedRoles.Contains(dto.RequestedRole) ? dto.RequestedRole : "Attendee";
+                    ApplyGoogleProfile(user, dto);
 
-                    if (roleToAssign == "Owner")
+                    var createResult = await userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
                     {
-                        user = new Owner();
-                    }
-                    else if (roleToAssign == "Organizer")
-                    {
-                        user = new Organizer
-                        {
-                            OrganizationName = dto.Name ?? dto.Email
-                        };
-                    }
-                    else
-                    {
-                        user = new Attendee();
-                    }
-
-                    user.UserName = dto.Email;
-                    user.Email = dto.Email;
-                    user.FullName = dto.Name;
-                    user.EmailConfirmed = true;
-                    user.Location = "Not Specified";
-                    user.CreatedAt = DateTime.UtcNow;
-                    user.IsBlocked = false;
-                    user.IsDeleted = false;
-
-                    var result = await userManager.CreateAsync(user);
-                    if (!result.Succeeded)
-                    {
-                        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                        var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
                         return new ExternalAuthResponseDto { IsSuccess = false, Message = $"User registration failed: {errors}" };
                     }
 
-                    var linkedResult = await userManager.AddLoginAsync(user, new UserLoginInfo(dto.Provider, dto.ProviderKey, dto.Provider));
-                    if (!linkedResult.Succeeded)
+                    var linkResult = await userManager.AddLoginAsync(user, new UserLoginInfo(dto.Provider, dto.ProviderKey, dto.Provider));
+                    if (!linkResult.Succeeded)
                     {
                         await userManager.DeleteAsync(user);
-                        return new ExternalAuthResponseDto { IsSuccess = false, Message = "Failed to link provider." };
+                        return new ExternalAuthResponseDto { IsSuccess = false, Message = "Failed to link Google login." };
                     }
 
-                    await userManager.AddToRoleAsync(user, roleToAssign);
+                    var roleResult = await userManager.AddToRoleAsync(user, roleToAssign);
+                    if (!roleResult.Succeeded)
+                    {
+                        await userManager.DeleteAsync(user);
+                        var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                        return new ExternalAuthResponseDto { IsSuccess = false, Message = $"Failed to assign role: {errors}" };
+                    }
                 }
-            }
-
-            // Generate refresh token and save it to the database
-            var roles = await userManager.GetRolesAsync(user);
-            var token = jwtService.GenerateToken(user, roles);
-            var generatedRefreshToken = refreshTokenService.GenerateToken();
-
-            if (user.RefreshTokens == null)
-            {
-                user.RefreshTokens = new List<Domain.Entities.AuthEntities.RefreshToken>();
-            }
-            var refreshTokenEntity = refreshTokenService.CreateRefreshToken(generatedRefreshToken);
-            user.RefreshTokens.Add(refreshTokenEntity);
-
-            var updateResult = await userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
-            {
-                return new ExternalAuthResponseDto { IsSuccess = false, Message = "Failed to create refresh token session." };
             }
 
             return new ExternalAuthResponseDto
             {
                 IsSuccess = true,
                 Message = "Authentication successful",
-                User = new UserDto
-                {
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    Token = token,
-                    RefreshToken = refreshTokenEntity.Token,
-                    ExpireOn = refreshTokenEntity.ExpiresOn
-                }
+                User = await GenerateAuthResponse(user)
+            };
+        }
+
+        private static void ApplyGoogleProfile(ApplicationUser user, ExternalAuthDto dto)
+        {
+            var nameParts = (dto.Name ?? dto.Email).Split(' ', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            user.UserName = dto.Email;
+            user.Email = dto.Email;
+            user.EmailConfirmed = true;
+            user.FirstName = nameParts.ElementAtOrDefault(0) ?? dto.Email;
+            user.LastName = nameParts.ElementAtOrDefault(1) ?? string.Empty;
+            user.IsDeleted = false;
+        }
+
+        private async Task<AuthResponseDto> GenerateAuthResponse(ApplicationUser user)
+        {
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            var authClaims = new List<Claim>
+            {
+                new(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+            var token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
+                expires: DateTime.Now.AddDays(Convert.ToDouble(config["Jwt:DurationInDays"])),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new AuthResponseDto
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = token.ValidTo,
+                UserId = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email!,
+                Roles = userRoles
             };
         }
     }
