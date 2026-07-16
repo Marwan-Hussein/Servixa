@@ -7,7 +7,7 @@ namespace Servixa.Abstractions.Interfaces
 {
     public interface IBookingService
     {
-        Task<ApiResponse<BookingResponseDto>> CreateBookingAsync(CreateBookingDto dto);
+        Task<ApiResponse<BookingResponseDto>> CreateBookingAsync(int clientId, CreateBookingDto dto);
         Task<ApiResponse<BookingResponseDto>> GetBookingByIdAsync(int id);
         Task<ApiResponse<IEnumerable<BookingResponseDto>>> GetClientBookingsAsync(int clientId);
         Task<ApiResponse<IEnumerable<BookingResponseDto>>> GetWorkerBookingsAsync(int workerId);
