@@ -7,8 +7,11 @@ using Servixa.Shared.DTOs.Booking;
 using Servixa.Domain.Contracts.UnitOfWorkPattern;
 using Servixa.Shared.Commen.Responses;
 using Servixa.Domain.Models.BookingEntity;
+using Servixa.Domain.Models.Users;
+using Servixa.Domain.Models;
 using Servixa.Shared.Enums;
 using Servixa.Domain.Specifications;
+using Servixa.Domain.Contracts;
 
 namespace Servixa.Services.Implementations
 {
@@ -21,11 +24,29 @@ namespace Servixa.Services.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ApiResponse<BookingResponseDto>> CreateBookingAsync(CreateBookingDto dto)
+        public async Task<ApiResponse<BookingResponseDto>> CreateBookingAsync(int clientId, CreateBookingDto dto)
         {
+            // Validate that the worker exists and is available
+            var workerRepo = _unitOfWork.GetReposatory<Worker, int>();
+            var worker = await workerRepo.GetByIdAsync(dto.WorkerId);
+
+            if (worker == null)
+                return new ApiResponse<BookingResponseDto>("Worker not found", 404);
+
+            if (!worker.IsAvailable)
+                return new ApiResponse<BookingResponseDto>("Worker is not available at this time", 400);
+
+            // Validate the worker actually offers the requested task
+            var workerTaskRepo = _unitOfWork.GetReposatory<WorkerTask, int>();
+            var allWorkerTasks = await workerTaskRepo.GetAllAsync();
+            var workerTask = allWorkerTasks.FirstOrDefault(wt => wt.WorkerId == dto.WorkerId && wt.TaskId == dto.TaskId);
+
+            if (workerTask == null)
+                return new ApiResponse<BookingResponseDto>("The selected worker does not offer this task", 400);
+
             var booking = new Booking
             {
-                ClientId = 1,
+                ClientId = clientId,
                 WorkerId = dto.WorkerId,
                 TaskId = dto.TaskId,
                 ScheduledDate = dto.ScheduledDate,
@@ -33,15 +54,14 @@ namespace Servixa.Services.Implementations
                 LocationLongitude = (double)dto.LocationLng,
                 LocationAddress = dto.Address,
                 Status = BookingStatus.Pending,
-                FinalCost = 0
+                FinalCost = workerTask.CustomPrice
             };
 
             var repo = _unitOfWork.GetReposatory<Booking, int>();
             await repo.AddAsync(booking);
             await _unitOfWork.SaveChangesAsync();
 
-            var responseDto = MapToResponseDto(booking);
-            return new ApiResponse<BookingResponseDto>(responseDto, "Created");
+            return new ApiResponse<BookingResponseDto>(MapToResponseDto(booking), "Booking created successfully");
         }
 
         public async Task<ApiResponse<BookingResponseDto>> GetBookingByIdAsync(int id)
@@ -51,12 +71,9 @@ namespace Servixa.Services.Implementations
             var booking = await repo.GetEntityWithSpecAsync(spec);
 
             if (booking == null)
-            {
-                return new ApiResponse<BookingResponseDto>(null!, "Not Found", 404);
-            }
+                return new ApiResponse<BookingResponseDto>("Booking not found", 404);
 
-            var responseDto = MapToResponseDto(booking);
-            return new ApiResponse<BookingResponseDto>(responseDto, "Ok");
+            return new ApiResponse<BookingResponseDto>(MapToResponseDto(booking), "Ok");
         }
 
         public async Task<ApiResponse<IEnumerable<BookingResponseDto>>> GetClientBookingsAsync(int clientId)
@@ -85,16 +102,13 @@ namespace Servixa.Services.Implementations
             var booking = await repo.GetByIdAsync(id);
 
             if (booking == null)
-            {
-                return new ApiResponse<BookingResponseDto>(null!, "Not Found", 404);
-            }
+                return new ApiResponse<BookingResponseDto>("Booking not found", 404);
 
             booking.Status = dto.Status;
             repo.UpdateAsync(booking);
             await _unitOfWork.SaveChangesAsync();
 
-            var responseDto = MapToResponseDto(booking);
-            return new ApiResponse<BookingResponseDto>(responseDto, "Ok");
+            return new ApiResponse<BookingResponseDto>(MapToResponseDto(booking), "Booking status updated");
         }
 
         public async Task<ApiResponse<bool>> CancelBookingAsync(int id)
@@ -103,15 +117,19 @@ namespace Servixa.Services.Implementations
             var booking = await repo.GetByIdAsync(id);
 
             if (booking == null)
-            {
-                return new ApiResponse<bool>(false, "Not Found", 404);
-            }
+                return new ApiResponse<bool>("Booking not found", 404);
+
+            if (booking.Status == BookingStatus.Completed)
+                return new ApiResponse<bool>("Cannot cancel a completed booking", 400);
+
+            if (booking.Status == BookingStatus.Cancelled)
+                return new ApiResponse<bool>("Booking is already cancelled", 400);
 
             booking.Status = BookingStatus.Cancelled;
             repo.UpdateAsync(booking);
             await _unitOfWork.SaveChangesAsync();
 
-            return new ApiResponse<bool>(true, "Cancelled");
+            return new ApiResponse<bool>(true, "Booking cancelled successfully");
         }
 
         private BookingResponseDto MapToResponseDto(Booking booking)

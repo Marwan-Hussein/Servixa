@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Servixa.Abstractions.Interfaces;
 using Servixa.Shared.DTOs.Booking;
@@ -16,13 +18,7 @@ namespace Servixa.Presentation.Controllers
             _bookingService = bookingService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto dto)
-        {
-            var result = await _bookingService.CreateBookingAsync(dto);
-            return Ok(result);
-        }
-
+        /// <summary>Worker or admin: view a single booking by its ID.</summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBookingById(int id)
         {
@@ -30,6 +26,7 @@ namespace Servixa.Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>Get all bookings for a specific client (admin or own client).</summary>
         [HttpGet("client/{clientId}")]
         public async Task<IActionResult> GetClientBookings(int clientId)
         {
@@ -37,6 +34,7 @@ namespace Servixa.Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>Get all bookings assigned to a worker.</summary>
         [HttpGet("worker/{workerId}")]
         public async Task<IActionResult> GetWorkerBookings(int workerId)
         {
@@ -44,6 +42,7 @@ namespace Servixa.Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>Worker updates booking status (Accepted, InProgress, Completed).</summary>
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateBookingStatus(int id, [FromBody] UpdateBookingStatusDto dto)
         {
@@ -51,6 +50,7 @@ namespace Servixa.Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>Cancel a booking (used by admin or direct route).</summary>
         [HttpDelete("{id}/cancel")]
         public async Task<IActionResult> CancelBooking(int id)
         {

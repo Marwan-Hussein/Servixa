@@ -20,6 +20,7 @@ namespace Servixa.Web.Extensions
             services.AddScoped<ISpecialtyService, SpecialtyService>();
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<IWorkerService, WorkerService>();
+            services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IPaymentService, PaymentService>();
