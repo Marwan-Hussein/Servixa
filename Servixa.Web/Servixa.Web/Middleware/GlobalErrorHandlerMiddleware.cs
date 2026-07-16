@@ -55,8 +55,9 @@ namespace Servixa.Web.Middleware
             string detailedMessage = ex.InnerException != null ? $"{ex.Message} \n Inner Details: {ex.GetBaseException().Message}": ex.Message;
            
             // used if server error exception only
-            string serverErrorMessage = env.IsDevelopment()? $"{detailedMessage} \n\nStackTrace:\n{ex.StackTrace}"
-                                                            : "An unexpected error occurred. Please try again later.";
+            //string serverErrorMessage = env.IsDevelopment()? $"{detailedMessage} \n\nStackTrace:\n{ex.StackTrace}"
+            //                                                : "An unexpected error occurred. Please try again later.";
+            string serverErrorMessage = $"{detailedMessage} \n\nStackTrace:\n{ex.StackTrace}";
 
             var response = ex switch
             {
